@@ -54,7 +54,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     )
   }
 
-  const pageTitle = PAGE_TITLES[pathname] ?? 'Portal Juruá302'
+  const pageTitle = pathname ? PAGE_TITLES[pathname] ?? 'Portal Juruá302' : 'Portal Juruá302'
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">

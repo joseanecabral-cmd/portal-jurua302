@@ -145,12 +145,6 @@ export default function ManutencaoPage() {
           </button>
         </div>
       )}
-        <div className="flex justify-end">
-          <button onClick={() => { setShowForm(true); setEditingId(null) }} className="btn-primary">
-            <Plus className="h-4 w-4" /> Registrar Manutenção
-          </button>
-        </div>
-      )}
 
       {/* Form */}
       {showForm && (isAdminOrOwner || isTenant) && (

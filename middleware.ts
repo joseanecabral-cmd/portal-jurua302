@@ -1,6 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+interface SupabaseCookie {
+  name: string
+  value: string
+  options?: {
+    path?: string
+    expires?: Date
+    httpOnly?: boolean
+    secure?: boolean
+    sameSite?: 'strict' | 'lax' | 'none'
+    domain?: string
+    maxAge?: number
+  }
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -9,12 +23,13 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
+        async getAll() {
+          return (await request.cookies).getAll()
         },
-        setAll(cookiesToSet) {
+        async setAll(cookiesToSet: SupabaseCookie[]) {
+          const requestCookies = await request.cookies
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            requestCookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>

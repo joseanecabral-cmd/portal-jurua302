@@ -9,11 +9,11 @@ import { randomBytes } from 'crypto'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-function buildServerSupabase() {
-  const cookieStore = cookies()
+async function buildServerSupabase() {
+  const cookieStore = await cookies()
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
+      async getAll() {
         return cookieStore.getAll()
       },
       setAll() {
@@ -50,7 +50,7 @@ function buildPublicSiteUrl() {
 }
 
 export async function POST(request: Request) {
-  const serverSupabase = buildServerSupabase()
+  const serverSupabase = await buildServerSupabase()
   const { data: { user }, error: authError } = await serverSupabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

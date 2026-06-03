@@ -38,8 +38,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ role, onClose, onSignOut }: SidebarProps) {
-  const pathname = usePathname()
-    const items = NAV.filter(n => n.roles.includes(role)).map(item => ({
+  const pathname = usePathname() ?? ''
+  const items = NAV.filter(n => n.roles.includes(role)).map(item => ({
     ...item,
     label: item.href === '/documentos' && role === 'applicant' ? 'Meus Documentos' : item.label,
   }))
