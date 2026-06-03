@@ -1,5 +1,6 @@
 'use client'
 
+import '@/styles/claude-design.css'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, Lock, Mail, Eye, EyeOff } from 'lucide-react'
@@ -89,105 +90,31 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-900 p-4">
-      <div className="w-full max-w-sm">
+    <main className="app">
+      <div className="scroll screen">
+        <div className="safe-top" />
 
-        {/* Brand */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-lg">
-            <Lock className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">Portal Juruá302</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Portal Juruá302 · Joinville SC
-          </p>
+        <div className="scr-head">
+          <div className="ey">Portal Juruá302</div>
+          <h1>Entrar no <em>Portal</em></h1>
+          <p className="sub">Acesso privado para clientes e administração.</p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl bg-white p-8 shadow-2xl">
-          {mode === 'login' ? (
-            <>
-              <h2 className="mb-6 text-center text-lg font-semibold text-gray-900">Entrar</h2>
+        <div className="pad">
+          <div className="card pd">
+            {mode === 'login' ? (
+              <>
+                <h2 className="section-title">Entrar</h2>
 
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="label">E-mail</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="seu@email.com"
-                      className="input pl-9"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="label">Senha</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="input pl-9 pr-9"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                    {error}
-                  </div>
-                )}
-
-                <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {loading ? 'Entrando…' : 'Entrar'}
-                </button>
-              </form>
-
-              <button
-                onClick={() => { setMode('reset'); setError('') }}
-                className="mt-4 w-full text-center text-sm text-blue-600 hover:underline"
-              >
-                Esqueci minha senha
-              </button>
-            </>
-          ) : (
-            <>
-              <h2 className="mb-2 text-center text-lg font-semibold text-gray-900">Recuperar senha</h2>
-              <p className="mb-6 text-center text-sm text-gray-500">
-                Informe seu e-mail e enviaremos um link para redefinir sua senha.
-              </p>
-
-              {success ? (
-                <div className="rounded-lg bg-green-50 p-4 text-sm text-green-700">
-                  {success}
-                </div>
-              ) : (
-                <form onSubmit={handleReset} className="space-y-4">
-                  <div>
-                    <label className="label">E-mail</label>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="field">
+                    <label className="lab">E-mail</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                       <input
                         type="email"
                         required
+                        autoComplete="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="seu@email.com"
@@ -196,32 +123,105 @@ export default function LoginPage() {
                     </div>
                   </div>
 
+                  <div className="field">
+                    <label className="lab">Senha</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="input pl-9 pr-9"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(v => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
                   {error && (
-                    <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                    <div className="card soft" style={{ color: '#A65A45', borderColor: 'var(--alert)' }}>
                       {error}
                     </div>
                   )}
 
-                  <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
-                    {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {loading ? 'Enviando…' : 'Enviar link de recuperação'}
+                  <button type="submit" disabled={loading} className="btn primary full">
+                    {loading ? 'Entrando…' : 'Entrar'}
                   </button>
                 </form>
-              )}
 
-              <button
-                onClick={() => { setMode('login'); setError(''); setSuccess('') }}
-                className="mt-4 w-full text-center text-sm text-blue-600 hover:underline"
-              >
-                Voltar ao login
-              </button>
-            </>
-          )}
+                <button
+                  type="button"
+                  onClick={() => { setMode('reset'); setError('') }}
+                  className="btn ghost full"
+                >
+                  Esqueci minha senha
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="section-title">Recuperar senha</h2>
+                <p className="sub" style={{ marginBottom: '18px' }}>
+                  Informe seu e-mail e enviaremos um link para redefinir sua senha.
+                </p>
+
+                {success ? (
+                  <div className="card soft" style={{ color: 'var(--green-deep)', borderColor: 'var(--green-line)' }}>
+                    {success}
+                  </div>
+                ) : (
+                  <form onSubmit={handleReset} className="space-y-4">
+                    <div className="field">
+                      <label className="lab">E-mail</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          placeholder="seu@email.com"
+                          className="input pl-9"
+                        />
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="card soft" style={{ color: '#A65A45', borderColor: 'var(--alert)' }}>
+                        {error}
+                      </div>
+                    )}
+
+                    <button type="submit" disabled={loading} className="btn primary full">
+                      {loading ? 'Enviando…' : 'Enviar link de recuperação'}
+                    </button>
+                  </form>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => { setMode('login'); setError(''); setSuccess('') }}
+                  className="btn ghost full"
+                >
+                  Voltar ao login
+                </button>
+              </>
+            )}
+          </div>
+
+          <p className="empty" style={{ marginTop: '18px', color: 'var(--ink-muted)' }}>
+            Acesso privado. Entre em contato com a administração para solicitar acesso.
+          </p>
         </div>
 
-        <p className="mt-6 text-center text-xs text-slate-500">
-          Acesso privado. Entre em contato com a administração para solicitar acesso.
-        </p>
+        <div className="safe-bottom" />
       </div>
     </main>
   )
