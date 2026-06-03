@@ -23,10 +23,10 @@ CREATE POLICY "Usuários atualizam próprio perfil (sem alterar role)"
     role = (SELECT role FROM public.profiles WHERE id = auth.uid())
   );
 
-CREATE POLICY "Admin atualiza qualquer perfil"
+CREATE POLICY "Admin e owner atualiza qualquer perfil"
   ON public.profiles FOR UPDATE
-  USING (has_role('admin'))
-  WITH CHECK (has_role('admin'));
+  USING (is_admin_or_owner())
+  WITH CHECK (is_admin_or_owner());
 
 -- ── DOCUMENTS ──────────────────────────────────────────────
 
@@ -49,10 +49,10 @@ CREATE POLICY "Usuário atualiza documentos pendentes"
   USING  (auth.uid() = user_id AND status IN ('enviado', 'correcao_solicitada'))
   WITH CHECK (auth.uid() = user_id AND status IN ('enviado', 'correcao_solicitada'));
 
-CREATE POLICY "Admin atualiza status dos documentos"
+CREATE POLICY "Admin e owner atualiza status dos documentos"
   ON public.documents FOR UPDATE
-  USING (has_role('admin'))
-  WITH CHECK (has_role('admin'));
+  USING (is_admin_or_owner())
+  WITH CHECK (is_admin_or_owner());
 
 CREATE POLICY "Usuário deleta próprios documentos enviados"
   ON public.documents FOR DELETE

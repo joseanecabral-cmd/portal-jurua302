@@ -68,14 +68,18 @@ export default function AdminPage() {
   const updateStatus = async (docId: string, status: DocumentStatus, notes?: string) => {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('documents').update({
+    const { error } = await supabase.from('documents').update({
       status,
       admin_notes: notes ?? null,
       reviewed_by: user?.id,
       reviewed_at: new Date().toISOString(),
     }).eq('id', docId)
-    setMessage(`Status atualizado para "${status}".`)
-    setTimeout(() => setMessage(''), 3000)
+    if (error) {
+      setMessage(`Erro ao atualizar status: ${error.message}`)
+    } else {
+      setMessage(`Status atualizado para "${status}".`)
+    }
+    setTimeout(() => setMessage(''), 4000)
     setLoading(false)
     load()
   }
@@ -99,22 +103,30 @@ export default function AdminPage() {
   const promoteToTenant = async (profileId: string, documents: Document[]) => {
     if (!canApproveApplicant(documents)) {
       setMessage('Não é possível aprovar como inquilino: ainda faltam documentos obrigatórios aprovados.')
-      setTimeout(() => setMessage(''), 3000)
+      setTimeout(() => setMessage(''), 4000)
       return
     }
 
     if (!confirm('Promover este candidato a Inquilino aprovado?')) return
-    await supabase.from('profiles').update({ role: 'tenant' }).eq('id', profileId)
-    setMessage('Usuário promovido a Inquilino.')
-    setTimeout(() => setMessage(''), 3000)
+    const { error } = await supabase.from('profiles').update({ role: 'tenant' }).eq('id', profileId)
+    if (error) {
+      setMessage(`Erro ao promover usuário: ${error.message}`)
+    } else {
+      setMessage('Usuário promovido a Inquilino.')
+    }
+    setTimeout(() => setMessage(''), 4000)
     load()
   }
 
   const changeRole = async (profileId: string, role: string) => {
     if (!confirm(`Alterar função deste usuário para '${role}'?`)) return
-    await supabase.from('profiles').update({ role }).eq('id', profileId)
-    setMessage('Função atualizada.')
-    setTimeout(() => setMessage(''), 3000)
+    const { error } = await supabase.from('profiles').update({ role }).eq('id', profileId)
+    if (error) {
+      setMessage(`Erro ao alterar função: ${error.message}`)
+    } else {
+      setMessage('Função atualizada.')
+    }
+    setTimeout(() => setMessage(''), 4000)
     load()
   }
 
@@ -342,7 +354,8 @@ export default function AdminPage() {
                         {isAdminOrOwner && (
                           <select
                             value={profile.role}
-                            onChange={e => changeRole(profile.id, e.target.value)}
+                            onClick={e => e.stopPropagation()}
+                            onChange={e => { e.stopPropagation(); changeRole(profile.id, e.target.value) }}
                             className="ml-2 rounded border bg-white px-2 py-1 text-xs"
                           >
                             <option value="owner">owner</option>
