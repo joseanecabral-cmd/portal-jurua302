@@ -241,6 +241,32 @@ export const CONDOMINIO_TYPE_LABELS: Record<CondominioDocType, string> = {
   outro: 'Outro',
 }
 
+export type ReciboStatus = 'gerado' | 'pago' | 'arquivado'
+
+export interface Recibo {
+  id: string
+  competencia: string
+  data_pagamento: string
+  aluguel: number
+  condominio: number
+  iptu: number
+  caucao: number
+  outros_valores: number
+  observacoes?: string | null
+  total: number
+  status: ReciboStatus
+  pdf_path?: string | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export const RECIBO_STATUS_LABELS: Record<ReciboStatus, string> = {
+  gerado: 'Gerado',
+  pago: 'Pago',
+  arquivado: 'Arquivado',
+}
+
 export const ROLE_LABELS: Record<Role, string> = {
   owner: 'Proprietário(a)',
   admin: 'Administrador(a)',

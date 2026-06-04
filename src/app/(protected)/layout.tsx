@@ -17,6 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/manual':         'Manual do Apartamento',
   '/condominio':     'Condomínio',
   '/boletos-contas': 'Boletos e Contas',
+  '/recibos':        'Recibos',
   '/manutencao':     'Manutenção',
 }
 

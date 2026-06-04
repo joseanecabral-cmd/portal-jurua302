@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, FileText, ShieldCheck, FileSignature,
   ClipboardList, Wallet, BookOpen, Building2,
-  Receipt, Wrench, MessageSquare, LogOut, X,
+  Receipt, Wrench, MessageSquare, LogOut, X, ScrollText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Role } from '@/types'
@@ -28,6 +28,7 @@ const NAV: NavItem[] = [
   { href: '/manual',         label: 'Manual',          icon: BookOpen,        roles: ['owner','admin','tenant'] },
   { href: '/condominio',     label: 'Condomínio',      icon: Building2,       roles: ['owner','admin','tenant'] },
   { href: '/boletos-contas', label: 'Boletos e Contas',icon: Receipt,         roles: ['owner','admin','tenant'] },
+  { href: '/recibos',        label: 'Recibos',          icon: ScrollText,      roles: ['owner','admin','tenant'] },
   { href: '/manutencao',     label: 'Manutenção',      icon: Wrench,          roles: ['owner','admin','tenant'] },
 ]
 
