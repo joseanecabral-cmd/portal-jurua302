@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  console.log('[invite:POST] Owner/Admin autenticado:', { userId: user.id, email: user.email })
+  console.log('[invite:POST] Owner/Admin autenticado:', { userId: user.id })
 
   const { data: profile, error: profileError } = await serverSupabase
     .from('profiles')
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Nome e e-mail são obrigatórios.' }, { status: 400 })
   }
 
-  console.log('[invite:POST] Dados do novo usuário:', { name, email, role, mode })
+  console.log('[invite:POST] Criando usuario:', { role, mode })
 
   const publicSiteUrl = buildPublicSiteUrl()
 
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
   }
 
   const userId = (createData as any).user?.id
-  console.log('[invite:POST] Novo usuário criado no Auth:', { userId, email, tempPassword })
+  console.log('[invite:POST] Novo usuario criado no Auth:', { userId, role })
 
   if (!userId) {
     console.error('[invite:POST] Falha: userId é null/undefined após createUser')
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     .eq('id', userId)
     .single()
 
-  console.log('[invite:POST] Verificando profile existente:', { userId, exists: !!existingProfile, checkError })
+  console.log('[invite:POST] Verificando profile existente:', { userId, exists: !!existingProfile })
 
   let upsertError
   if (existingProfile) {
@@ -150,14 +150,14 @@ export async function POST(request: Request) {
       role,
     }).eq('id', userId)
     upsertError = updateErr
-    console.log('[invite:POST] Profile atualizado (UPDATE):', { userId, email, role, error: updateErr })
+    console.log('[invite:POST] Profile atualizado (UPDATE):', { userId, role, error: updateErr })
   } else {
     // INSERT se não existir
     const { error: insertErr } = await admin.from('profiles').insert([
       { id: userId, email, full_name: name, role },
     ])
     upsertError = insertErr
-    console.log('[invite:POST] Profile criado (INSERT):', { userId, email, role, error: insertErr })
+    console.log('[invite:POST] Profile criado (INSERT):', { userId, role, error: insertErr })
   }
 
   if (upsertError) {
@@ -165,7 +165,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: upsertError.message }, { status: 500 })
   }
 
-  console.log('[invite:POST] Sucesso completo:', { userId, email, role, tempPassword })
+  console.log('[invite:POST] Sucesso completo:', { userId, role })
 
   if (mode === 'email') {
     return NextResponse.json({ ok: true, inviteByEmail: true, role, email, userId })

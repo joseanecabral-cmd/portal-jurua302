@@ -62,6 +62,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Role-based protection: /admin requires admin or owner
+  if (pathname.startsWith('/admin') && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || !['admin', 'owner'].includes(profile.role)) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
   return supabaseResponse
 }
 
