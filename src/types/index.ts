@@ -17,6 +17,40 @@ export type DocumentStatus =
 
 export type VistoriaType = 'entrada' | 'saida' | 'periodica'
 export type VistoriaFileType = 'pdf' | 'photo' | 'video'
+
+export type VistoriaFileCategory =
+  | 'ACCESS'
+  | 'LIVING_ROOM'
+  | 'KITCHEN'
+  | 'LAUNDRY'
+  | 'BEDROOM'
+  | 'BATHROOM'
+  | 'BALCONY'
+  | 'GARAGE'
+  | 'COMPLEMENTARY'
+  | 'EXISTING_DAMAGE'
+  | 'INSPECTION_REPORT'
+  | 'INSPECTION_RECEIPT'
+
+export const VISTORIA_CATEGORY_LABELS: Record<VistoriaFileCategory, string> = {
+  ACCESS:             'Acesso ao Imóvel',
+  LIVING_ROOM:        'Sala',
+  KITCHEN:            'Cozinha',
+  LAUNDRY:            'Lavanderia',
+  BEDROOM:            'Quarto',
+  BATHROOM:           'Banheiro',
+  BALCONY:            'Sacada',
+  GARAGE:             'Garagem',
+  COMPLEMENTARY:      'Registros Complementares',
+  EXISTING_DAMAGE:    'Avarias Existentes',
+  INSPECTION_REPORT:  'Laudo de Vistoria',
+  INSPECTION_RECEIPT: 'Termo de Recebimento',
+}
+
+export const PHOTO_ENVIRONMENT_CATEGORIES: VistoriaFileCategory[] = [
+  'ACCESS', 'LIVING_ROOM', 'KITCHEN', 'LAUNDRY', 'BEDROOM',
+  'BATHROOM', 'BALCONY', 'GARAGE', 'COMPLEMENTARY', 'EXISTING_DAMAGE',
+]
 export type CaucaoStatus = 'pendente' | 'recebido' | 'devolvido' | 'retido'
 export type BoletoType = 'aluguel' | 'condominio' | 'aluguel_condominio' | 'luz' | 'outro'
 export type ManutencaoStatus = 'registrado' | 'em_andamento' | 'concluido'
@@ -87,6 +121,7 @@ export interface VistoriaFile {
   file_type: VistoriaFileType
   file_size?: number | null
   mime_type?: string | null
+  category?: string | null
   created_at: string
 }
 
