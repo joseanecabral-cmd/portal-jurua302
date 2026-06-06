@@ -28,7 +28,7 @@ const NAV: NavItem[] = [
   { href: '/manual',         label: 'Manual',          icon: BookOpen,        roles: ['owner','admin','tenant'] },
   { href: '/condominio',     label: 'Condomínio',      icon: Building2,       roles: ['owner','admin','tenant'] },
   { href: '/boletos-contas', label: 'Boletos e Contas',icon: Receipt,         roles: ['owner','admin','tenant'] },
-  { href: '/recibos',        label: 'Recibos',          icon: ScrollText,      roles: ['owner','admin','tenant'] },
+  { href: '/recibos',        label: 'Recibos',          icon: ScrollText,      roles: ['owner','admin'] },
   { href: '/manutencao',     label: 'Manutenção',      icon: Wrench,          roles: ['owner','admin','tenant'] },
 ]
 
