@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   Download, Trash2, Plus, ChevronDown, ChevronUp,
   FileText, Video, ClipboardList, X, Camera, Upload,
@@ -169,6 +169,83 @@ function VideoSection({ files, vistoriaId, isAdmin, onUpload, onDownload, onDele
   )
 }
 
+// ── Sub-componente: PhotoCard ─────────────────────────────────────────────────
+
+interface PhotoCardProps {
+  file: VistoriaFile
+  isAdmin: boolean
+  getSignedUrl: (path: string, expiresIn?: number) => Promise<string | null>
+  onLightbox: (url: string, name: string) => void
+  onDownload: (path: string) => void
+  onDelete: (file: VistoriaFile) => void
+}
+
+function PhotoCard({ file, isAdmin, getSignedUrl, onLightbox, onDownload, onDelete }: PhotoCardProps) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [imgError, setImgError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setImgError(false)
+    getSignedUrl(file.file_path, 600)
+      .then(url => { if (!cancelled) { setPreviewUrl(url); setLoading(false) } })
+      .catch(() => { if (!cancelled) { setLoading(false); setImgError(true) } })
+    return () => { cancelled = true }
+  }, [file.file_path, getSignedUrl])
+
+  return (
+    <div className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+      <button
+        onClick={() => previewUrl && !imgError && onLightbox(previewUrl, file.file_name)}
+        className="h-full w-full focus:outline-none"
+        title="Ampliar foto"
+      >
+        {loading ? (
+          <div className="flex h-full items-center justify-center">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+          </div>
+        ) : previewUrl && !imgError ? (
+          <>
+            <img
+              src={previewUrl}
+              alt={file.file_name}
+              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+              onError={() => setImgError(true)}
+            />
+            <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+          </>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-1 p-2">
+            <ImageIcon className="h-8 w-8 text-gray-300" />
+            <p className="w-full truncate text-center text-xs text-gray-500">{file.file_name}</p>
+            <p className="text-xs text-gray-400">{formatBytes(file.file_size)}</p>
+          </div>
+        )}
+      </button>
+      <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          onClick={e => { e.stopPropagation(); onDownload(file.file_path) }}
+          className="rounded bg-white/90 p-1 text-gray-700 shadow hover:bg-white"
+          title="Baixar"
+        >
+          <Download className="h-3 w-3" />
+        </button>
+        {isAdmin && (
+          <button
+            onClick={e => { e.stopPropagation(); onDelete(file) }}
+            className="rounded bg-white/90 p-1 text-red-500 shadow hover:bg-white"
+            title="Remover"
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Sub-componente: Acervo Fotográfico ────────────────────────────────────────
 
 interface AcervoProps {
@@ -180,17 +257,18 @@ interface AcervoProps {
   uploadTarget: { vistoriaId: string; category: string } | null
   setUploadTarget: (t: { vistoriaId: string; category: string } | null) => void
   onUpload:   (path: string, name: string, size: number, category: string) => void
-  onLightbox: (file: VistoriaFile) => void
+  onLightbox: (url: string, name: string) => void
   onDownload: (path: string) => void
   onDelete:   (file: VistoriaFile) => void
   onError:    (msg: string) => void
+  getSignedUrl: (path: string, expiresIn?: number) => Promise<string | null>
 }
 
 function AcervoFotografico({
   files, vistoriaId, isAdmin,
   expandedEnv, setExpandedEnv,
   uploadTarget, setUploadTarget,
-  onUpload, onLightbox, onDownload, onDelete, onError,
+  onUpload, onLightbox, onDownload, onDelete, onError, getSignedUrl,
 }: AcervoProps) {
   const envKey  = (cat: string) => `${vistoriaId}:${cat}`
   const isOpen  = (cat: string) => expandedEnv === envKey(cat)
@@ -290,38 +368,15 @@ function AcervoFotografico({
             {catFiles.length > 0 ? (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {catFiles.map(f => (
-                  <div
+                  <PhotoCard
                     key={f.id}
-                    className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100"
-                  >
-                    <button
-                      onClick={() => onLightbox(f)}
-                      className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 transition-colors hover:bg-blue-100"
-                      title="Ampliar foto"
-                    >
-                      <ImageIcon className="h-8 w-8 text-gray-300 group-hover:text-blue-400" />
-                      <p className="w-full truncate text-center text-xs text-gray-500">{f.file_name}</p>
-                      <p className="text-xs text-gray-400">{formatBytes(f.file_size)}</p>
-                    </button>
-                    <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button
-                        onClick={e => { e.stopPropagation(); onDownload(f.file_path) }}
-                        className="rounded bg-white/90 p-1 text-gray-700 shadow hover:bg-white"
-                        title="Baixar"
-                      >
-                        <Download className="h-3 w-3" />
-                      </button>
-                      {isAdmin && (
-                        <button
-                          onClick={e => { e.stopPropagation(); onDelete(f) }}
-                          className="rounded bg-white/90 p-1 text-red-500 shadow hover:bg-white"
-                          title="Remover"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                    file={f}
+                    isAdmin={isAdmin}
+                    getSignedUrl={getSignedUrl}
+                    onLightbox={onLightbox}
+                    onDownload={onDownload}
+                    onDelete={onDelete}
+                  />
                 ))}
               </div>
             ) : (
@@ -341,35 +396,15 @@ function AcervoFotografico({
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {uncategorized.map(f => (
-              <div
+              <PhotoCard
                 key={f.id}
-                className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100"
-              >
-                <button
-                  onClick={() => onLightbox(f)}
-                  className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 hover:bg-amber-100"
-                >
-                  <ImageIcon className="h-8 w-8 text-gray-300" />
-                  <p className="w-full truncate text-center text-xs text-gray-500">{f.file_name}</p>
-                  <p className="text-xs text-gray-400">{formatBytes(f.file_size)}</p>
-                </button>
-                <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={e => { e.stopPropagation(); onDownload(f.file_path) }}
-                    className="rounded bg-white/90 p-1 text-gray-700 shadow"
-                  >
-                    <Download className="h-3 w-3" />
-                  </button>
-                  {isAdmin && (
-                    <button
-                      onClick={e => { e.stopPropagation(); onDelete(f) }}
-                      className="rounded bg-white/90 p-1 text-red-500 shadow"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
+                file={f}
+                isAdmin={isAdmin}
+                getSignedUrl={getSignedUrl}
+                onLightbox={onLightbox}
+                onDownload={onDownload}
+                onDelete={onDelete}
+              />
             ))}
           </div>
         </div>
@@ -401,7 +436,7 @@ export default function VistoriaPage() {
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState('')
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -462,10 +497,14 @@ export default function VistoriaPage() {
     if (data) window.open(data.signedUrl, '_blank')
   }
 
-  const openLightbox = async (file: VistoriaFile) => {
-    const { data } = await supabase.storage.from(BUCKET).createSignedUrl(file.file_path, 300)
-    if (data) setLightbox({ url: data.signedUrl, name: file.file_name })
+  const openLightbox = (url: string, name: string) => {
+    setLightbox({ url, name })
   }
+
+  const getSignedUrl = useCallback(async (filePath: string, expiresIn = 600): Promise<string | null> => {
+    const { data } = await supabase.storage.from(BUCKET).createSignedUrl(filePath, expiresIn)
+    return data?.signedUrl ?? null
+  }, [supabase])
 
   const handleDeleteFile = async (file: VistoriaFile) => {
     if (!confirm(`Remover "${file.file_name}"?`)) return
@@ -708,6 +747,7 @@ export default function VistoriaPage() {
                           onDownload={handleDownload}
                           onDelete={handleDeleteFile}
                           onError={setError}
+                          getSignedUrl={getSignedUrl}
                         />
                       )}
 
